@@ -1,32 +1,59 @@
-# Prerequisites
-*.d
+// Pin tanımlama işlemi
+ int LM35 = A0;
+ int maviLED = 3;
+ int sariLED = 5;
+ int kirmiziLED = 6;  //İstenirse "define" ile de tanımlanabilir ama ben C syntaxına daha çok benzesin diye integer kullandım.
+ int buzzer = 9;
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+void setup() {
+  Serial.begin(9600);       // Seri haberleşme saniyede 9600 bit işlem yapma seçeneği ile ilerledik istenirse bu artırılıp azaltalabilir.
+  
+  //Çıkış elemanları tanımlandı.
+  pinMode(maviLED, OUTPUT);
+  pinMode(sariLED, OUTPUT);
+  pinMode(kirmiziLED, OUTPUT);  
+  pinMode(buzzer, OUTPUT);
+}
 
-# Precompiled Headers
-*.gch
-*.pch
+void loop() {
+ 
+   int sicaklik = analogRead(A0);
+  float gercekSicaklik = (sicaklik * 0.48828125); // Analog değeri sıcaklığa çevirme. (Küsüratlı çarpım değerini internetten buldum.)
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+  // LOG kaydı tutuluyor
+   Serial.print("Sicaklik: ");
+  Serial.print(gercekSicaklik);
+  Serial.println(" °C");
+  
+  // LED'lerin istenen aralıklara göre yanıp sönme durumları ayarlandı
+  if (gercekSicaklik >= 25 && gercekSicaklik < 30) 
+  {
+    digitalWrite(maviLED, HIGH);
+    digitalWrite(sariLED, LOW);
+    digitalWrite(kirmiziLED, LOW);
+    tone(buzzer, 250);         //tone komutu buzzera çalma işlevi sağlar. Yanındaki sayı istenen şiddet düzeyidir.
+  } 
+  else if (gercekSicaklik >= 30 && gercekSicaklik < 35) 
+  {
+    digitalWrite(maviLED, LOW);
+    digitalWrite(sariLED, HIGH);
+    digitalWrite(kirmiziLED, LOW);
+    tone(buzzer, 500);
+  } 
+  else if (gercekSicaklik >= 35 && gercekSicaklik < 40) 
+  {
+    digitalWrite(maviLED, LOW);
+    digitalWrite(sariLED, LOW);
+    digitalWrite(kirmiziLED, HIGH);
+    tone(buzzer,1000);
+  } 
+  else
+  {
+    digitalWrite(maviLED, LOW);
+    digitalWrite(sariLED, LOW);
+    digitalWrite(kirmiziLED, LOW);
+    noTone(buzzer);   
+  }
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+  delay(1000);                           // 1 saniye bekleme süresi (istenirse değişilir.)
+}
